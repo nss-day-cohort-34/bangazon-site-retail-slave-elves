@@ -16,16 +16,16 @@
 @foreach (var item in Model.GroupedProducts) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.TypeName)
+                @Html.ActionLink(item.TypeName, "ProductTypeDetails", "Products", new { id = item.TypeId })
 
                 (@Html.DisplayFor(modelItem => item.ProductCount))
-            
-            @foreach(var i in item.Products)
-            {
+
+                @foreach (var i in item.Products)
+                {
                     <p>
-                        @Html.ActionLink(i.Title, "Details", "Products", new { id = i.ProductId})
+                        @Html.ActionLink(i.Title, "Details", "Products", new { id = i.ProductId })
                     </p>
-            }
+                }
             </td>
 
         </tr>
