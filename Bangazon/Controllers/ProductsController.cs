@@ -27,6 +27,7 @@ namespace Bangazon.Controllers
 
         public async Task<IActionResult> Types()
         {
+       
             var model = new ProductTypesViewModel();
             
             model.GroupedProducts = await _context
