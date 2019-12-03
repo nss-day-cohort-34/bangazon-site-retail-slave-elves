@@ -68,6 +68,6 @@
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.ProductId">Edit</a> |
-    <a asp-action="AddToOrder" asp-route-id="@Model.ProductId">Add To Order</a> |
+    @Html.ActionLink("Add To Order", "AddToOrder", "Orders", new { id = Model.ProductId}) |
     <a asp-action="Index">Back to List</a>
 </div>
