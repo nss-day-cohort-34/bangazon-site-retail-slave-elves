@@ -5,6 +5,7 @@ namespace Bangazon.Models
 {
     public class GroupedProducts
     {
+        [key]
         public int TypeId { get; set; }
         public string TypeName { get; set; }
         public int ProductCount { get; set; }
