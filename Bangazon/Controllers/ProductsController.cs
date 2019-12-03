@@ -8,16 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
 using Bangazon.Models.ProductViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bangazon.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
-        public ProductsController(ApplicationDbContext context)
+        public ProductsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
 
@@ -66,11 +70,28 @@ namespace Bangazon.Controllers
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+
+        public async Task<IActionResult> CreateAsync()
         {
             ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label");
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            return View();
+            List<ProductType> categories = await _context.ProductType.ToListAsync();
+          
+
+            var updated = categories.Select(c => new SelectListItem(c.Label, c.ProductTypeId.ToString())).ToList();
+            updated.Insert(0, new SelectListItem("Select a category", null));
+
+
+            var viewModel = new ProductCreateViewModel
+            {
+                productTypes = updated
+            };
+    
+
+               
+            
+          
+            return View(viewModel);
         }
 
         // POST: Products/Create
@@ -78,19 +99,39 @@ namespace Bangazon.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,DateCreated,Description,Title,Price,Quantity,UserId,City,ImagePath,Active,ProductTypeId")] Product product)
+        public async Task<IActionResult> Create(ProductCreateViewModel viewModel )
         {
+            ModelState.Remove("Product.User");
+            ModelState.Remove("Product.UserId");
+            ModelState.Remove("Product.ProductType");
+
+
+            var product = viewModel.product;
+
             if (ModelState.IsValid)
             {
+                var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+                product.UserId = currentUser.Id;
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ProductTypeId"] = new SelectList(_context.ProductType, "ProductTypeId", "Label", product.ProductTypeId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", product.UserId);
-            return View(product);
-        }
 
+            List<ProductType> categories = await _context.ProductType.ToListAsync();
+
+
+            var updated = categories.Select(c => new SelectListItem(c.Label, c.ProductTypeId.ToString())).ToList();
+            updated.Insert(0, new SelectListItem("Select a category", null));
+
+
+            viewModel.productTypes = updated;
+
+
+
+
+
+            return View(viewModel);
+        }
         // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
