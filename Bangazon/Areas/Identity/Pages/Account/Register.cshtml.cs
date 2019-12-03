@@ -84,12 +84,8 @@ namespace Bangazon.Areas.Identity.Pages.Account
                     FirstName = Input.FirstName,
                     LastName = Input.LastName,
                     StreetAddress = Input.StreetAddress,
-<<<<<<< HEAD
-                    UserName = Input.Email, Email = Input.Email,
-=======
                     UserName = Input.Email,
                     Email = Input.Email,
->>>>>>> master
                     EmailConfirmed = true
                 };
                 var result = await _userManager.CreateAsync(user, Input.Password);

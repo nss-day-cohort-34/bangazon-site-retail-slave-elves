@@ -189,9 +189,9 @@ namespace Bangazon.Controllers
                 _context.OrderProduct.Add(new OrderProduct { ProductId = Id, OrderId = currentOrder.OrderId});
                   
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Details));
+                return RedirectToAction("Index", "Home");
             }
-            return RedirectToAction(nameof(Details));
+            return RedirectToAction("Details", "Products");
         }
 
 
