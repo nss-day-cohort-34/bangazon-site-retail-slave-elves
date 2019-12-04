@@ -9,6 +9,7 @@ using Bangazon.Data;
 using Bangazon.Models;
 using Microsoft.AspNetCore.Identity;
 using Bangazon.Models.OrderViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Bangazon.Controllers
 {
@@ -133,6 +134,7 @@ namespace Bangazon.Controllers
             return View(order);
         }
 
+        [Authorize]
         public async Task<IActionResult> DeleteOrderProduct(int? id)
         {
             if (id == null)
@@ -154,6 +156,7 @@ namespace Bangazon.Controllers
 
         // POST: OrderProducts/Delete/5
         [HttpPost, ActionName("DeleteOrderProduct")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteODConfirmed(int id)
         {
@@ -168,6 +171,7 @@ namespace Bangazon.Controllers
 
 
         // GET: Orders/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -190,6 +194,7 @@ namespace Bangazon.Controllers
 
         // POST: Orders/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -204,6 +209,7 @@ namespace Bangazon.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(ViewCart));
         }
+        [Authorize]
         public async Task<IActionResult> ViewCart(int id)
         {
 
