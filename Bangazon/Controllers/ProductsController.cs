@@ -36,8 +36,8 @@ namespace Bangazon.Controllers
                 {
                     TypeId = pt.ProductTypeId,
                     TypeName = pt.Label,
-                    ProductCount = pt.Products.Count(),
-                    Products = pt.Products.OrderByDescending(p => p.DateCreated).Take(3)
+                    ProductCount = pt.Products.Where(p => p.Active == true).Count(),
+                    Products = pt.Products.OrderByDescending(p => p.DateCreated).Where(p => p.Active == true).Take(3)
                 }).ToListAsync();
 
             return View(model);
@@ -46,9 +46,19 @@ namespace Bangazon.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
+            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Active == true);
             return View(await applicationDbContext.ToListAsync());
         }
+        
+        public async Task<IActionResult> GetMyProducts()
+        {
+            var user = await GetCurrentUserAsync();
+
+            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id && p.Active == true);
+            return View(await applicationDbContext.ToListAsync());
+        }
+
+
 
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -233,7 +243,8 @@ namespace Bangazon.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
+            product.Active = false;
+            _context.Product.Update(product);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
