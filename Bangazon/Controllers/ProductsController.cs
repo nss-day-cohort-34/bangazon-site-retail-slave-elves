@@ -44,10 +44,18 @@ namespace Bangazon.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string q)
         {
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Active == true);
-            return View(await applicationDbContext.ToListAsync());
+            if (q == null)
+            {
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
+                return View(await applicationDbContext.ToListAsync());
+            }
+            else
+            {
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Title.Contains(q) || p.City.Contains(q));
+                return View(await applicationDbContext.ToListAsync());
+            }
         }
         
         public async Task<IActionResult> GetMyProducts()
