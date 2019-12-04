@@ -20,7 +20,7 @@ namespace Bangazon.Controllers
         }
         public IActionResult Index()
         {
-            var applicationDbContext = _context.Product.OrderByDescending(p => p.DateCreated).Take(20).ToList();
+            var applicationDbContext = _context.Product.OrderByDescending(p => p.DateCreated).Where(p => p.Active == true).Take(20).ToList();
             return View(applicationDbContext);
         }
 
