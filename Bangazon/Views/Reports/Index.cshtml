@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Bangazon.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Reports</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Reoprt Name
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+      
+            <tr>
+                <td>
+                    <a asp-action="Create">Incomplete Orders</a>
+                </td>
+           
+            </tr>
+    
+    </tbody>
+</table>
