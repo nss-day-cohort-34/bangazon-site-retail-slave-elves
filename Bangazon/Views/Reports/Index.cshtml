@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Bangazon.Models.Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Reports</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Reoprt Name
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+      
+            <tr>
+                <td>
+                    <a asp-action="IncompleteOrders">Incomplete Orders</a>
+                </td>
+           
+            </tr>
+    
+    </tbody>
+</table>

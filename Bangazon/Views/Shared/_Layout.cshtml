@@ -13,7 +13,7 @@
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
               crossorigin="anonymous"
-              integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE="/>
+              integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" />
     </environment>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -48,8 +48,13 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Types">Product Types</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="GetMyProducts">My Products</a>
+                        </li>
                         <li>
+
                             <div class="search_bar">
                                 <form asp-controller="Products" asp-action="Index" method="get">
                                     <input name="q" id="Search" placeholder="Product Name/City" />
@@ -57,6 +62,7 @@
                                     <a asp-action="Index"></a>
                                 </form>
                             </div>
+
                         </li>
                     </ul>
                 </div>
