@@ -47,8 +47,19 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Types">Product Types</a>
                         </li>
+<<<<<<< HEAD
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="Index">Reports</a>
+=======
+                        <li>
+                            <div class="search_bar">
+                                <form asp-controller="Products" asp-action="Index" method="get">
+                                    <input name="q" id="Search" placeholder="Product Name/City" />
+                                    <input type="submit" value="Search" />
+                                    <a asp-action="Index"></a>
+                                </form>
+                            </div>
+>>>>>>> master
                         </li>
                     </ul>
                 </div>
