@@ -260,13 +260,43 @@ namespace Bangazon.Controllers
                 {
                     _context.Add(new Order { UserId = user.Id });
                     await _context.SaveChangesAsync();
+                    List<Order> newActiveOrder = _context.Order.Where(o => o.UserId == user.Id && o.PaymentType == null).ToList();
+                    Order currentOrder = newActiveOrder[0];
+                    _context.OrderProduct.Add(new OrderProduct { ProductId = Id, OrderId = currentOrder.OrderId});
+                }
+                else
+                {
+                    Order currentOrder = activeOrders[0];
+                    _context.OrderProduct.Add(new OrderProduct { ProductId = Id, OrderId = currentOrder.OrderId});
                 }
 
-                Order currentOrder = activeOrders[0];
 
-                _context.OrderProduct.Add(new OrderProduct { ProductId = Id, OrderId = currentOrder.OrderId});
                   
                 await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Home");
+            }
+            return RedirectToAction("Details", "Products");
+        }
+
+        public async Task<IActionResult> CompleteOrder(int Id) //referring to paymentTypeId that will be gotten by select menu. probably
+        {
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                List<Order> activeOrders = _context.Order.Where(o => o.UserId == user.Id && o.PaymentType == null).ToList();
+
+
+                if (activeOrders.Any())
+                {
+                    Order currentOrder = activeOrders[0];
+                    _context.Update(currentOrder.PaymentTypeId = Id);
+                    await _context.SaveChangesAsync();
+                }
+
+
+
                 return RedirectToAction("Index", "Home");
             }
             return RedirectToAction("Details", "Products");
