@@ -38,6 +38,9 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
+
+
+
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.DateCreated)
@@ -60,9 +63,18 @@
             <td>
                 @Html.DisplayFor(modelItem => item.ProductType.Label)
             </td>
-            <td>
-                @Html.ActionLink("Delete", "Delete", "Products", new { id = item.ProductId })
-            </td>
+            @if (item.Active == true)
+            {
+                <td>
+                    @Html.ActionLink("Make Inactive", "Delete", "Products", new { id = item.ProductId })
+                </td>
+            }
+            else
+            {
+                <td>
+                    @Html.ActionLink("Make Active", "MakeActive", "Products", new { id = item.ProductId })
+                </td>
+            }
         </tr>
 }
     </tbody>

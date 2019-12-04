@@ -49,12 +49,12 @@ namespace Bangazon.Controllers
         {
             if (q == null)
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Active == true);
                 return View(await applicationDbContext.ToListAsync());
             }
             else
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Title.Contains(q) || p.City.Contains(q));
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Title.Contains(q) || p.City.Contains(q)).Where(p => p.Active == true);
                 return View(await applicationDbContext.ToListAsync());
             }
         }
@@ -63,7 +63,7 @@ namespace Bangazon.Controllers
         {
             var user = await GetCurrentUserAsync();
 
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id && p.Active == true);
+            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -256,8 +256,39 @@ namespace Bangazon.Controllers
             product.Active = false;
             _context.Product.Update(product);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(GetMyProducts));
         }
+
+        public async Task<IActionResult> MakeActive(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Product
+                .Include(p => p.ProductType)
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(m => m.ProductId == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
+        [HttpPost, ActionName("MakeActive")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MakeActive(int id)
+        {
+            var product = await _context.Product.FindAsync(id);
+            product.Active = true;
+            _context.Product.Update(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(GetMyProducts));
+        }
+
 
         private bool ProductExists(int id)
         {
