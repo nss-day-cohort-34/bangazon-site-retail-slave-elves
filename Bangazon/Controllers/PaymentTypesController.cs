@@ -7,17 +7,22 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bangazon.Data;
 using Bangazon.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bangazon.Controllers
 {
     public class PaymentTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public PaymentTypesController(ApplicationDbContext context)
+        public PaymentTypesController(ApplicationDbContext ctx, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _userManager = userManager;
+            _context = ctx;
         }
+
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
         // GET: PaymentTypes
         public async Task<IActionResult> Index()
@@ -66,6 +71,8 @@ namespace Bangazon.Controllers
 
             if (ModelState.IsValid)
             {
+                var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+                paymentType.UserId = currentUser.Id;
                 _context.Add(paymentType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
