@@ -53,7 +53,7 @@ namespace Bangazon.Controllers
             }
             else
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Title.Contains(q));
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Title.Contains(q) || p.City.Contains(q));
                 return View(await applicationDbContext.ToListAsync());
             }
         }
