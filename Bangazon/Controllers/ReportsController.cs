@@ -26,9 +26,12 @@ namespace Bangazon.Controllers
             return View();
         }
         // Get incomplete orders report
-        public IActionResult IncompleteOrders()
+        public async Task<IActionResult> IncompleteOrders()
         {
-            return View();
+            var applicationDbContext = _context.Order.Include(o => o.User)
+                .Include(o => o.OrderProducts)
+                .ThenInclude(op => op.Product).Where(o => o.PaymentType == null);
+            return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Reports/Details/5
