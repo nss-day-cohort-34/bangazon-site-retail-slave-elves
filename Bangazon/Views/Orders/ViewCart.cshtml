@@ -1,0 +1,61 @@
+﻿@model Bangazon.Models.OrderViewModels.OrderDetailViewModel
+
+@{
+    ViewData["Title"] = "ViewCart";
+}
+
+<h1>Shopping Cart</h1>
+@if (Model.Order == null)
+{
+    <tr>
+        <td>
+            <span>Your Shopping Cart is Empty</span>
+        </td>
+    </tr>
+}
+else
+{
+    <dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Order.DateCreated)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Order.DateCreated)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Order.DateCompleted)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Order.DateCompleted)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Order.User)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Order.User.Id)
+</dd>
+<dt class="col-sm-2">
+    @Html.DisplayNameFor(model => model.Order.PaymentType)
+</dt>
+<dd class="col-sm-10">
+    @Html.DisplayFor(model => model.Order.PaymentType.AccountNumber)
+</dd>
+
+@foreach (var item in Model.Order.OrderProducts)
+{
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => item.Product.Title)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => item.Product.Title)
+        @Html.DisplayFor(model => item.Product.Price)
+        @Html.DisplayFor(model => item.Product.ProductType.Label)
+    </dd>
+    <div><a asp-controller="OrderProducts" asp-action="Delete" asp-route-id="@item.OrderProductId">Delete</a></div>
+}
+
+<hr />
+<div>
+    <a asp-action="Delete" asp-route-id="@Model.Order.OrderId">Delete Entire Order</a>|
+    <a asp-action="Edit" asp-route-id="@Model.Order.OrderId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>}
