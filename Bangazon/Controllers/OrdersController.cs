@@ -133,6 +133,40 @@ namespace Bangazon.Controllers
             return View(order);
         }
 
+        public async Task<IActionResult> DeleteOrderProduct(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var orderProduct = await _context.OrderProduct
+                .Include(o => o.Order)
+                .Include(o => o.Product)
+                .FirstOrDefaultAsync(m => m.OrderProductId == id);
+            if (orderProduct == null)
+            {
+                return NotFound();
+            }
+
+            return View(orderProduct);
+        }
+
+        // POST: OrderProducts/Delete/5
+        [HttpPost, ActionName("DeleteOrderProduct")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteODConfirmed(int id)
+        {
+            var orderProduct = await _context.OrderProduct.FindAsync(id);
+            _context.OrderProduct.Remove(orderProduct);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ViewCart", "Orders", new { id = orderProduct.OrderId });
+        }
+
+
+
+
+
         // GET: Orders/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -187,8 +221,8 @@ namespace Bangazon.Controllers
                 .Select(g => new OrderLineItem
                 {
                     Product = g.Key,
-                    Units = g.Select(l => l.Product).Count(),
-                    Cost = g.Key.Price * g.Select(l => l.ProductId).Count()
+                    Units = g.Select(x => x.Product).Count(),
+                    Cost = g.Key.Price * g.Select(x => x.ProductId).Count()
                 }).ToList();
             return View(viewModel);
         }
