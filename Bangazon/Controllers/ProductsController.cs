@@ -91,16 +91,20 @@ namespace Bangazon.Controllers
                 }
             }
 
+            List<OrderProduct> productOrderProducts = new List<OrderProduct>();
+
             foreach (var p in userProducts)
             {
                 foreach (var op in matchingOrderProducts)
                 {
                     if (op.ProductId == p.ProductId)
                     {
-                        p.OrderProducts.Add(op);
+                        productOrderProducts.Add(op);
                     }
                 }
             }
+
+            
 
             var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.OrderProducts).Include(p => p.User).Where(p => p.UserId == user.Id);
             return View(await applicationDbContext.ToListAsync());
