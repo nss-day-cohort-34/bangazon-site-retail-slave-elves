@@ -23,11 +23,7 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-
+        private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
 
         [TempData]
         public string StatusMessage { get; set; }
@@ -44,7 +40,6 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Last Name")]
             public string LastName { get; set; }
 
-            [Display(Name = "Address")]
             public string Address { get; set; }
 
             [Phone]
@@ -54,12 +49,10 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
 
         private async Task LoadAsync(ApplicationUser user)
         {
-            var firstName = await _userManager.GetUserNameAsync(user);
-            var lastName = await _userManager.GetUserNameAsync(user);
-            var address = await _userManager.GetUserNameAsync(user);
+            var firstName = user.FirstName;
+            var lastName = user.LastName;
+            var address = user.StreetAddress;
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-
-            FirstName = firstName;
 
             Input = new InputModel
             {
@@ -107,6 +100,22 @@ namespace Bangazon.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            if (Input.FirstName != user.FirstName)
+            {
+                user.FirstName = Input.FirstName;
+            }
+
+            if (Input.LastName != user.LastName)
+            {
+                user.LastName = Input.LastName;
+            }
+
+            if (Input.Address != user.StreetAddress)
+            {
+                user.StreetAddress = Input.Address;
+            }
+
+            await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
