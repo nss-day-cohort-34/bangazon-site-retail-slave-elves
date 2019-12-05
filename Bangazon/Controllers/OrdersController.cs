@@ -219,13 +219,14 @@ namespace Bangazon.Controllers
             Order order = await _context.Order
                 .Include(o => o.PaymentType)
                 .Include(o => o.User)
+                .ThenInclude(U => U.PaymentTypes)
                 .Include(o => o.OrderProducts)
                 .ThenInclude(op => op.Product)
                 .FirstOrDefaultAsync(m => m.UserId == currentUser.Id.ToString() && m.PaymentTypeId == null);
 
             viewModel.Order = order;
 
-            if (order == null)
+            if (order == null || order.PaymentType != null)
             {
                 return View(viewModel);
             }
@@ -278,30 +279,75 @@ namespace Bangazon.Controllers
             return RedirectToAction("Details", "Products");
         }
 
-        public async Task<IActionResult> CompleteOrder(int Id) //referring to paymentTypeId that will be gotten by select menu. probably
+
+        // GET: Orders/CompletePayment/2
+        public async Task<IActionResult> CloseOrder(int id)
         {
-            ModelState.Remove("UserId");
-            ModelState.Remove("User");
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var order =_context.Order.FirstOrDefault(o => o.OrderId == id);
+            var OrderProducts = _context.OrderProduct.Include(o => o.Product).Where(o => o.OrderId == id).ToList();
+            var paymentTypes = _context.PaymentType.Where(p => p.UserId == user.Id).ToList();
+            var viewModel = new OrderCloseViewModel();
+            viewModel.PaymentTypes = paymentTypes.Select(a => new SelectListItem
+            {
+                Value = a.PaymentTypeId.ToString(),
+                Text = a.AccountNumber
+            }).ToList();
+            viewModel.Order = order;
+            viewModel.Order.OrderProducts = OrderProducts;
+
+            return View(viewModel);
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> CloseOrder(int id, OrderCloseViewModel viewModel)
+        {
+            var currentOrder = _context.Order.Include(o => o.OrderProducts).FirstOrDefault(o => o.OrderId == id);
+
+            var OrderProducts = _context.OrderProduct.Include(o => o.Product).Where(o => o.OrderId == id).ToList();
+
+            currentOrder.DateCompleted = DateTime.Now;
+            currentOrder.PaymentTypeId = viewModel.Order.PaymentTypeId;
+
+//remove from quantity and update DB
+            foreach (var item in OrderProducts)
+            {
+                item.Product.Quantity = item.Product.Quantity - 1;
+                _context.Update(item.Product);
+            }
+
+            ModelState.Remove("Order.UserId");
+            ModelState.Remove("Order.User");
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-                List<Order> activeOrders = _context.Order.Where(o => o.UserId == user.Id && o.PaymentType == null).ToList();
+                _context.Update(currentOrder);
 
-
-                if (activeOrders.Any())
-                {
-                    Order currentOrder = activeOrders[0];
-                    _context.Update(currentOrder.PaymentTypeId = Id);
-                    await _context.SaveChangesAsync();
-                }
-
-
-
-                return RedirectToAction("Index", "Home");
+                await _context.SaveChangesAsync();
+                return RedirectToAction("ConfirmationPage", "Orders", new { id = id }); ;
             }
-            return RedirectToAction("Details", "Products");
+
+          
+
+            return View(viewModel);
         }
 
 
+        public async Task<IActionResult> ConfirmationPage(int id)
+        {
+
+            var viewModel = new OrderDetailViewModel();
+
+            var currentUser = await GetCurrentUserAsync();
+            Order order = await _context.Order
+                .Include(o => o.PaymentType)
+                .Include(o => o.User)
+                .ThenInclude(U => U.PaymentTypes)
+                .Include(o => o.OrderProducts)
+                .ThenInclude(op => op.Product)
+                .FirstOrDefaultAsync(m => m.OrderId == id);
+
+         
+            return View(order);
+        }
     }
 }

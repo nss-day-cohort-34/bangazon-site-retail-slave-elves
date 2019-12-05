@@ -25,7 +25,10 @@
                 @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
+                <span>Current Inventory</span>
+            </th>
+            <th>
+                <span>Number Sold</span>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.City)
@@ -37,33 +40,56 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DateCreated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.City)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductType.Label)
-            </td>
-            <td>
-                @Html.ActionLink("Delete", "Delete", "Products", new { id = item.ProductId })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+
+            List<OrderProduct> orderProducts = new List<OrderProduct>();
+            foreach (var i in item.OrderProducts)
+            {
+                if (i.Order.PaymentTypeId != null)
+                {
+                    orderProducts.Add(i);
+                }
+            }
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateCreated)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @orderProducts.Count()
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.City)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductType.Label)
+                </td>
+                @if (item.Active == true)
+                {
+                    <td>
+                        @Html.ActionLink("Make Inactive", "Delete", "Products", new { id = item.ProductId })
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @Html.ActionLink("Make Active", "MakeActive", "Products", new { id = item.ProductId })
+                    </td>
+                }
+            </tr>
+        }
     </tbody>
 </table>
