@@ -49,12 +49,12 @@ namespace Bangazon.Controllers
         {
             if (q == null)
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User);
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Active == true);
                 return View(await applicationDbContext.ToListAsync());
             }
             else
             {
-                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Title.Contains(q) || p.City.Contains(q));
+                var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.Title.Contains(q) || p.City.Contains(q)).Where(p => p.Active == true);
                 return View(await applicationDbContext.ToListAsync());
             }
         }
@@ -63,7 +63,50 @@ namespace Bangazon.Controllers
         {
             var user = await GetCurrentUserAsync();
 
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id && p.Active == true);
+            List<Product> userProducts = _context.Product.Include(p => p.ProductType).Include(p => p.OrderProducts).Include(p => p.User).Where(p => p.UserId == user.Id).ToList();
+            List<int> userProductIds = userProducts.Select(p => p.ProductId).ToList();
+
+            List<OrderProduct> orderProducts = _context.OrderProduct.ToList();
+            List<Order> orders = _context.Order.Include(o => o.OrderProducts).ToList();
+            List<Order> completedOrders = orders.Where(o => o.PaymentTypeId != null).ToList();
+
+            //List<OrderProduct> matchingOrderProducts = new List<OrderProduct>();
+
+            //foreach (var op in orderProducts)
+            //{
+            //    foreach (var p in userProductIds)
+            //    {
+            //        foreach (var o in completedOrders)
+            //        {
+            //            foreach (var oop in o.OrderProducts)
+            //            {
+            //                if (p == op.ProductId && oop == op)
+            //                {
+            //                    matchingOrderProducts.Add(op);
+            //                }
+
+            //            }
+
+            //        }
+            //    }
+            //}
+
+            //List<OrderProduct> productOrderProducts = new List<OrderProduct>();
+
+            //foreach (var p in userProducts)
+            //{
+            //    foreach (var op in matchingOrderProducts)
+            //    {
+            //        if (op.ProductId == p.ProductId)
+            //        {
+            //            productOrderProducts.Add(op);
+            //        }
+            //    }
+            //}
+
+            
+
+            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.OrderProducts).Include(p => p.User).Where(p => p.UserId == user.Id);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -252,12 +295,66 @@ namespace Bangazon.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
+            List<Order> orders = _context.Order.Include(o => o.OrderProducts).ToList();
+            List<OrderProduct> toBeDeleted = new List<OrderProduct>();
+            foreach (var o in orders)
+            {
+                if (o.PaymentTypeId == null)
+                {
+                    foreach (var op in o.OrderProducts)
+                    {
+                        if (op.ProductId == id)
+                        {
+                            toBeDeleted.Add(op);
+                        }
+                    }
+                }
+            }
+
+            foreach (var op in toBeDeleted)
+            {
+                _context.OrderProduct.Remove(op);
+                await _context.SaveChangesAsync();
+            }
+
             var product = await _context.Product.FindAsync(id);
             product.Active = false;
             _context.Product.Update(product);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(GetMyProducts));
         }
+
+        public async Task<IActionResult> MakeActive(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Product
+                .Include(p => p.ProductType)
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(m => m.ProductId == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
+        [HttpPost, ActionName("MakeActive")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MakeActive(int id)
+        {
+            var product = await _context.Product.FindAsync(id);
+            product.Active = true;
+            _context.Product.Update(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(GetMyProducts));
+        }
+
 
         private bool ProductExists(int id)
         {
