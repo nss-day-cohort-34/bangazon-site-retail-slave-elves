@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Bangazon.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "MultipleOpenOrders";
+}
+
+<h1>MultipleOpenOrders</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            List<Order> orders = new List<Order>();
+            foreach (var order in item.Orders)
+            {
+                if (order.PaymentTypeId == null)
+                {
+                    orders.Add(order);
+                }
+            }
+            if (orders.Count > 1)
+            {
+                <tr>
+
+                    <td> @Html.DisplayFor(modelItem => item.FullName)</td>
+
+                    <td>
+                        @orders.Count()
+                    </td>
+
+                </tr>
+            }
+        }
+    </tbody>
+</table>

@@ -22,7 +22,7 @@ namespace Bangazon.Controllers
         // GET: Reports
         public async Task<IActionResult> Index()
         {
-         
+
             return View();
         }
         // Get incomplete orders report
@@ -37,11 +37,16 @@ namespace Bangazon.Controllers
         // Get multiple open orders report
         public async Task<IActionResult> MultipleOpenOrders()
         {
-            var applicationDbContext = _context.Order.Include(o => o.User)
-                .Include(o => o.OrderProducts)
-                .ThenInclude(op => op.Product).Where(o => o.PaymentType == null);
-            return View(await applicationDbContext.ToListAsync());
+            var applicationDbContext = _context.ApplicationUsers.Include(o => o.Orders);
+
+                     return View(await applicationDbContext.ToListAsync());
         }
+           
+
+
+
+
+
 
         // GET: Reports/Details/5
         public async Task<IActionResult> Details(int? id)
