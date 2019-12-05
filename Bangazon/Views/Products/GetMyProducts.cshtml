@@ -25,7 +25,10 @@
                 @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
+                <span>Current Inventory</span>
+            </th>
+            <th>
+                <span>Number Sold</span>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.City)
@@ -56,6 +59,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @item.OrderProducts.Count()
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.City)

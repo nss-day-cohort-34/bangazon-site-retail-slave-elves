@@ -63,7 +63,46 @@ namespace Bangazon.Controllers
         {
             var user = await GetCurrentUserAsync();
 
-            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.User).Where(p => p.UserId == user.Id);
+            List<Product> userProducts = _context.Product.Include(p => p.ProductType).Include(p => p.OrderProducts).Include(p => p.User).Where(p => p.UserId == user.Id).ToList();
+            List<int> userProductIds = userProducts.Select(p => p.ProductId).ToList();
+
+            List<OrderProduct> orderProducts = _context.OrderProduct.ToList();
+            List<Order> orders = _context.Order.Include(o => o.OrderProducts).ToList();
+            List<Order> completedOrders = orders.Where(o => o.PaymentTypeId != null).ToList();
+
+            List<OrderProduct> matchingOrderProducts = new List<OrderProduct>();
+
+            foreach (var op in orderProducts)
+            {
+                foreach (var p in userProductIds)
+                {
+                    foreach (var o in completedOrders)
+                    {
+                        foreach (var oop in o.OrderProducts)
+                        {
+                            if (p == op.ProductId && oop == op)
+                            {
+                                matchingOrderProducts.Add(op);
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+            foreach (var p in userProducts)
+            {
+                foreach (var op in matchingOrderProducts)
+                {
+                    if (op.ProductId == p.ProductId)
+                    {
+                        p.OrderProducts.Add(op);
+                    }
+                }
+            }
+
+            var applicationDbContext = _context.Product.Include(p => p.ProductType).Include(p => p.OrderProducts).Include(p => p.User).Where(p => p.UserId == user.Id);
             return View(await applicationDbContext.ToListAsync());
         }
 
