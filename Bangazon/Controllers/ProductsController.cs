@@ -70,39 +70,39 @@ namespace Bangazon.Controllers
             List<Order> orders = _context.Order.Include(o => o.OrderProducts).ToList();
             List<Order> completedOrders = orders.Where(o => o.PaymentTypeId != null).ToList();
 
-            List<OrderProduct> matchingOrderProducts = new List<OrderProduct>();
+            //List<OrderProduct> matchingOrderProducts = new List<OrderProduct>();
 
-            foreach (var op in orderProducts)
-            {
-                foreach (var p in userProductIds)
-                {
-                    foreach (var o in completedOrders)
-                    {
-                        foreach (var oop in o.OrderProducts)
-                        {
-                            if (p == op.ProductId && oop == op)
-                            {
-                                matchingOrderProducts.Add(op);
-                            }
+            //foreach (var op in orderProducts)
+            //{
+            //    foreach (var p in userProductIds)
+            //    {
+            //        foreach (var o in completedOrders)
+            //        {
+            //            foreach (var oop in o.OrderProducts)
+            //            {
+            //                if (p == op.ProductId && oop == op)
+            //                {
+            //                    matchingOrderProducts.Add(op);
+            //                }
 
-                        }
+            //            }
 
-                    }
-                }
-            }
+            //        }
+            //    }
+            //}
 
-            List<OrderProduct> productOrderProducts = new List<OrderProduct>();
+            //List<OrderProduct> productOrderProducts = new List<OrderProduct>();
 
-            foreach (var p in userProducts)
-            {
-                foreach (var op in matchingOrderProducts)
-                {
-                    if (op.ProductId == p.ProductId)
-                    {
-                        productOrderProducts.Add(op);
-                    }
-                }
-            }
+            //foreach (var p in userProducts)
+            //{
+            //    foreach (var op in matchingOrderProducts)
+            //    {
+            //        if (op.ProductId == p.ProductId)
+            //        {
+            //            productOrderProducts.Add(op);
+            //        }
+            //    }
+            //}
 
             
 
