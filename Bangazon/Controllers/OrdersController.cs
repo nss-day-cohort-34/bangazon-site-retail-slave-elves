@@ -285,6 +285,7 @@ namespace Bangazon.Controllers
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var order =_context.Order.FirstOrDefault(o => o.OrderId == id);
+            var OrderProducts = _context.OrderProduct.Include(o => o.Product).Where(o => o.OrderId == id).ToList();
             var paymentTypes = _context.PaymentType.Where(p => p.UserId == user.Id).ToList();
             var viewModel = new OrderCloseViewModel();
             viewModel.PaymentTypes = paymentTypes.Select(a => new SelectListItem
@@ -293,6 +294,7 @@ namespace Bangazon.Controllers
                 Text = a.AccountNumber
             }).ToList();
             viewModel.Order = order;
+            viewModel.Order.OrderProducts = OrderProducts;
 
             return View(viewModel);
 
@@ -324,7 +326,7 @@ namespace Bangazon.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-
+          
 
             return View(viewModel);
         }
