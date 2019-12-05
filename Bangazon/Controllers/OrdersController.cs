@@ -323,7 +323,7 @@ namespace Bangazon.Controllers
                 _context.Update(currentOrder);
 
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("ConfirmationPage", "Orders", new { id = id }); ;
             }
 
           
@@ -332,5 +332,22 @@ namespace Bangazon.Controllers
         }
 
 
+        public async Task<IActionResult> ConfirmationPage(int id)
+        {
+
+            var viewModel = new OrderDetailViewModel();
+
+            var currentUser = await GetCurrentUserAsync();
+            Order order = await _context.Order
+                .Include(o => o.PaymentType)
+                .Include(o => o.User)
+                .ThenInclude(U => U.PaymentTypes)
+                .Include(o => o.OrderProducts)
+                .ThenInclude(op => op.Product)
+                .FirstOrDefaultAsync(m => m.OrderId == id);
+
+         
+            return View(order);
+        }
     }
 }

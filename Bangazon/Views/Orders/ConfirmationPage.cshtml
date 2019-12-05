@@ -1,0 +1,66 @@
+﻿@model Bangazon.Models.Order
+
+@{
+    ViewData["Title"] = "ConfirmationPage";
+}
+
+<h1>Confirmation Page</h1>
+
+<div>
+    <h4>Thank you for your purchase.</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OrderId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DateCreated)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateCreated)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DateCompleted)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateCompleted)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PaymentType)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PaymentType.AccountNumber)
+        </dd>
+        <dt class="col-sm-2">
+            Purchased Products
+        </dt>
+        <dd class="col-sm-10">
+            @foreach (var item in Model.OrderProducts)
+            {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => item.Product)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => item.Product.Title)
+                @Html.DisplayFor(model => item.Product.Price)
+
+            </dd>
+
+        }
+            </dd>
+
+        </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.OrderId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
