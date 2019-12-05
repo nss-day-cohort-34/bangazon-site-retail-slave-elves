@@ -51,15 +51,15 @@ else
         <a asp-action="Delete" asp-route-id="@Model.Order.OrderId">Cancel Order</a>|
         @if (Model.Order.User.PaymentTypes.Count == 0)
         {
-            <a asp-action="AddPayment" asp-route-id="@Model.Order.User.Id">Create a Payment Type before proceeding</a>
+            @Html.ActionLink("Create a payment Type before proceeding", "Create", "PaymentTypes", new { id = Model.Order.User.Id})
         }
         else
         {
 
 
-        @if (Model.Order.OrderProducts.Count != 0)
-        {
-            <a asp-action="CloseOrder" asp-route-id="@Model.Order.OrderId">Confirm Shopping Cart</a>
+            @if (Model.Order.OrderProducts.Count != 0)
+            {
+                <a asp-action="CloseOrder" asp-route-id="@Model.Order.OrderId">Confirm Shopping Cart</a>
             }
         }
 
