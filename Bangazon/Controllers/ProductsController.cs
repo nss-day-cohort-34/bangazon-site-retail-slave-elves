@@ -252,6 +252,29 @@ namespace Bangazon.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
+            List<Order> orders = _context.Order.Include(o => o.OrderProducts).ToList();
+            List<OrderProduct> toBeDeleted = new List<OrderProduct>();
+            foreach (var o in orders)
+            {
+                if (o.PaymentTypeId == null)
+                {
+                    foreach (var op in o.OrderProducts)
+                    {
+                        if (op.ProductId == id)
+                        {
+                            toBeDeleted.Add(op);
+                        }
+                    }
+                }
+            }
+
+            foreach (var op in toBeDeleted)
+            {
+                _context.OrderProduct.Remove(op);
+                await _context.SaveChangesAsync();
+            }
+
             var product = await _context.Product.FindAsync(id);
             product.Active = false;
             _context.Product.Update(product);
